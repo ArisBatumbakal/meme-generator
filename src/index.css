@@ -11,3 +11,116 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#root{
+  align-self:center;
+  width:90%;
+  max-width: 700px;
+  margin: auto;
+}
+
+header{
+  display:flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width:90%;
+  padding:1% 5%;
+  background: linear-gradient(90deg, #2a9135 1.18%, #2db33a 100%);
+}
+header > img{
+  width:3%;
+  min-width:30px;
+  flex-grow:1;
+}
+header > h2{
+  color:white;
+  flex-grow:2;
+}
+header > p{
+  flex-grow:7;
+  text-align: right;
+  color:rgb(255, 255, 255);
+}
+
+#meme-form{
+  width:90%;
+  margin: 5%;
+  display:grid;
+  grid-template-columns: auto auto;
+  gap:20px;
+}
+
+#meme-form > input,
+#meme-form > button{
+  height:50px;
+  border-radius: 5px;
+  font-weight:bold;
+}
+#meme-form > input{
+  border:solid 1px gray;
+  padding-left: 5px;
+  text-indent: 5px;
+}
+#meme-form > button{
+  background-color: #2a9135;
+  border: none;
+  cursor: pointer;
+  color:rgb(255, 255, 255);
+  grid-column: 1/3;
+}
+#result-img{
+  width:100%;
+  max-width: 700px;
+}
+
+#result-edit-export{
+  width:100%;
+  position:relative;
+}
+#f-text-cap, #s-text-cap{
+  position:absolute;
+  font-size: 30px;
+  color:white;
+  font-weight: 800;
+  text-shadow: 0px 1px 1px rgb(0, 0, 0);
+  cursor:grab;
+}
+#f-text-cap:active, #s-text-cap:active{
+  cursor: grabbing;
+}
+
+.font-size-box, .color-box{
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.font-size-box > span,
+.color-box > span{
+  font-size: large;
+}
+#font-size, #give-color{
+  font-size: 30px;
+  width:100px;
+  margin-left:20px;
+}
+#give-color{
+  width:50px;
+  border:none;
+  height:40px;
+}
+#s-text-cap{
+  bottom:5px;
+  left:10px;
+}
+#exportbtn{
+  width:90%;
+  height:40px;
+  font-size:16px;
+  border: none;
+  border-radius: 5px;
+  color:white;
+  font-weight: bold;
+  background-color: #2a9135;
+  margin: 0 5%;
+}
