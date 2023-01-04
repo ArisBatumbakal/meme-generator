@@ -1,56 +1,67 @@
-import React, {useState, useRef} from "react";
-import MemeData from "./memesData.js";
+import React, {useState, useRef, useEffect} from "react";
 import {exportComponentAsJPEG} from "react-component-export-image";
 
 let getEl = (e) => document.querySelector(e);
 
 
 export default function Form(){
-    let [fText, setFText] = useState("first text go here");
-    let [sText, setSText] = useState("second text go here");
-    let [myfstyle, setMyfStyle] = useState({top:'0px', left: '0px'});
-    let [mysstyle, setMySStyle] = useState({bottom:'0px', left: '0px'});
+    let [compo, setCompo] = useState({f: "", 
+                                      s: "", 
+                                      image: "https://i.imgflip.com/4t0m5.jpg"});
+    let [myStyle, setMyStyle] = useState({f:{top:'0px', left: '0px'}, 
+                                          s:{bottom:'0px', left: '0px'},
+                                          font:{fontSize:'30px', color: "#ffffff"}});
+    
+    let [memesData, setMemeData] = useState({})                             
+
     const exportImage = useRef();
+
+    useEffect(() => {
+        fetch("https://api.imgflip.com/get_memes")
+        .then(res => res.json())
+        .then(data => setMemeData(data))
+        console.log("ran")
+    }, [])
 
     function randomMeme(e){
         e.preventDefault();
-        let randNum = Math.floor(Math.random()*MemeData.data.memes.length)
-        let randMeme = MemeData.data.memes[randNum];
+        let randNum = Math.floor(Math.random()*memesData.data.memes.length)
+        let randMeme = memesData.data.memes[randNum];
         if(randMeme.box_count == 2){
-            getEl("#result-img").src = randMeme.url;
-            setFText("first text goes here");
-            setSText("second text goes here");
-            setMyfStyle({top: 0, left: 0});
-            setMySStyle({bottom: 0, left: 0});
+            setCompo({f: "", 
+                      s: "", 
+                      image: randMeme.url});
+            setMyStyle({f:{top:'0px', left: '0px'}, 
+                        s:{bottom:'0px', left: '0px'},
+                        font:{fontSize:'30px', color: "#ffffff"}});
+            
         }else{
             randomMeme(e);
         }
     }
 
-    function fTextkey(e){setFText(e.target.value)}
-    function sTextkey(e){setSText(e.target.value)}
-    function dragFText(e){
-        let resultDiv = getEl("#result-edit-export").getBoundingClientRect();
-        let leftvar = Math.floor(e.clientX)-Math.floor(resultDiv.left);
-        let topvar = Math.floor(e.clientY)-Math.floor(resultDiv.top);
-        setMyfStyle({top: topvar, left: leftvar});
+    function setTexts(e){
+        let {id, value} = e.target;
+        setCompo(prev => (id === "f-txt" ? {...prev, f: value.toString()} : {...prev, s: value.toString()}))
     }
-    function dragSText(e){
+
+    function dragText(e){
+        let {id} = e.target;
         let resultDiv = getEl("#result-edit-export").getBoundingClientRect();
         let leftvar = Math.floor(e.clientX)-Math.floor(resultDiv.left);
         let topvar = Math.floor(e.clientY)-Math.floor(resultDiv.top);
-        setMySStyle({top: topvar, left: leftvar});
+        setMyStyle(prev => (id === "f-text-cap" ? {...prev, f:{top: topvar, left: leftvar}}
+            : {...prev, s:{top: topvar, left: leftvar}}))
     }
 
     function changeFontText(e){
-        getEl("#f-text-cap").style.fontSize = e.target.value+"px";
-        getEl("#s-text-cap").style.fontSize = e.target.value+"px";
+        let {value} = e.target
+        setMyStyle(prev => ({...prev, font:{color:prev.font.color, fontSize: `${value}px`}}))
     }
 
     function changeColor(e){
-        getEl("#f-text-cap").style.color = e.target.value.toString();
-        getEl("#s-text-cap").style.color = e.target.value.toString();
-        console.log(e.target.value.toString());
+        let {value} = e.target
+        setMyStyle(prev => ({...prev, font:{color: value.toString(), fontSize: prev.font.fontSize}}))
     }
 
 
@@ -58,24 +69,44 @@ export default function Form(){
     <main>
         <form id="meme-form">
             <button id="submit" onClick={randomMeme}>Get a random new meme image &#128248;</button>
-            <input id="f-txt" onKeyUp={fTextkey} className="textbox" type="text" placeholder="1st text here"/>
-            <input id="s-txt" onKeyUp={sTextkey} className="textbox" type="text" placeholder="2nd text here"/>
+            <input id="f-txt" 
+                    onChange={setTexts} 
+                    className="textbox" 
+                    type="text" 
+                    value={compo.f}
+                    placeholder="1st text here"/>
+            <input id="s-txt" 
+                    onChange={setTexts} 
+                    className="textbox" 
+                    type="text" 
+                    value={compo.s}
+                    placeholder="2nd text here"/>
             <div className="color-box">
                 <span>Font Color: </span>
-                <input id="give-color" type="color" defaultValue="#ffffff" onChange={changeColor}/>
+                <input id="give-color" type="color" value={myStyle.font.color} onChange={changeColor}/>
             </div>
             <div className="font-size-box">
                 <span>Font Size:</span>
-                <input type="number" id="font-size" defaultValue="30" onChange={changeFontText}/>
+                <input type="number" id="font-size" value={myStyle.font.fontSize.slice(0,-2)} onChange={changeFontText}/>
             </div>
         </form>
         <hr/>
         
         <React.Fragment>
         <div id="result-edit-export" ref={exportImage}>
-            <span id="f-text-cap" draggable="true" style={myfstyle} onDrag={dragFText} onDragEnd={dragFText}>{fText}</span>
-            <span id="s-text-cap" draggable="true" style={mysstyle} onDrag={dragSText} onDragEnd={dragSText}>{sText}</span>
-            <img id="result-img" src="https://i.imgflip.com/4t0m5.jpg" alt="results will go here"/>
+            <span 
+                id="f-text-cap" 
+                draggable="true" 
+                style={{...myStyle.f, ...myStyle.font}}
+                onDrag={dragText} 
+                onDragEnd={dragText}>{compo.f}</span>
+            <span 
+                id="s-text-cap" 
+                draggable="true" 
+                style={{...myStyle.s, ...myStyle.font}} 
+                onDrag={dragText} 
+                onDragEnd={dragText}>{compo.s}</span>
+            <img id="result-img" src={compo.image} alt="results will go here"/>
         </div>
             <button id="exportbtn" onClick={() => exportComponentAsJPEG(exportImage)}>Export as Image</button>
         </React.Fragment>
